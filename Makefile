@@ -1,12 +1,13 @@
-CC=pgcc
-PIC=-fpic
+CC     = pgcc
+CFLAGS = -fPIC -ta=tesla -I$(CUDA_HOME)/include -I$(ACC_HOME)/include
+LFLAGS = -L$(CUDA_HOME)/lib64 -lnvToolsExt
 AR=ar
 
 liboaccnvtx.so: liboaccnvtx.a
-	$(CC) -shared -o $@ -L$(CUDA_HOME)/lib64 -lnvToolsExt -Wl,-soname=$@ -Wl,--whole-archive $< -Wl,--no-whole-archive
+	$(CC) -shared -o $@ $(LFLAGS) -lnvToolsExt -Wl,-soname=$@ -Wl,--whole-archive $< -Wl,--no-whole-archive
 
 openacc-nvtx.o: openacc-nvtx.c
-	$(CC) -ta=tesla $(PIC) -I$(CUDA_HOME)/include -c $<
+	$(CC) $(CFLAGS) -c $<
 
 liboaccnvtx.a: openacc-nvtx.o
 	$(AR) cr $@ $^
